@@ -1,0 +1,6 @@
+package boggle;
+
+
+class Board {
+
+}
