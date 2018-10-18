@@ -18,16 +18,22 @@ public class Trie {
     for(int i = 0; i < cs.length; i++) {
       char c = cs[i];
       if (i == cs.length - 1) {
-        // not last character, must traverse
-        TrieNode n = trie.containsChar(c) ? trie.getNode(c) : new TrieNode(false);
-        trie = n.getTrie();
-      } else {
         // last character
         if (trie.containsChar(c)) {
           trie.getNode(c).setIsWord(true);
         } else {
           trie.add(c, new TrieNode(true));
         }
+      } else {
+        // not last character, must traverse
+        TrieNode n;
+        if (trie.containsChar(c)) {
+          n = trie.getNode(c);
+        } else {
+          n = new TrieNode(false);
+          trie.add(c, n);
+        }
+        trie = n.getTrie();
       }
     }
   }
@@ -48,6 +54,27 @@ public class Trie {
     return map.get(c);
   }
 
+  @Override
+  public String toString() {
+    StringBuffer buff = new StringBuffer();
+    toString(buff, 0);
+    return buff.toString();
+  }
+
+  public void toString(StringBuffer buff, int levels) {
+    for (char c : map.keySet()) {
+      TrieNode n = map.get(c);
+      for(int i = 0; i < levels * 4; i++) {
+        buff.append(' ');
+      }
+      buff.append(c);
+      buff.append(' ');
+      buff.append("isWord = ");
+      buff.append(n.isWord());
+      buff.append('\n');
+      n.getTrie().toString(buff, levels + 1);
+    }
+  }
 
   public class TrieNode {
     private boolean isWord;
