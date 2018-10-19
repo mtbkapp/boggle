@@ -1,5 +1,6 @@
 (ns boggle.core
-  (:require [clojure.spec.alpha :as spec]))
+  (:require [clojure.spec.alpha :as spec]
+            [clojure.string :as string]))
 
 (spec/def ::trie (spec/map-of char? ::node))
 (spec/def ::node (spec/keys :req [::word? ::trie]))
@@ -107,6 +108,19 @@
            :args (spec/cat :board ::board :index ::trie)
            :ret ::word-set)
 
+(def test-board2
+  [[\p \p \a \w \v]
+   [\o \r \e \r \e]
+   [\g \y \e \s \d]
+   [\a \e \p \y \c]
+   [\n \s \t \r \a]])
+
+(defn -main
+  [& args]
+  (let [words (string/split-lines (slurp "../corncob_lowercase.txt"))]
+  (doseq [w (find-all test-board2 (index-dict words))]
+    (println w))))
+
 (comment
   (def dictionary
     ["and" "ant" "are" "bike" "bug" "buggy" "colorado" "utah"])
@@ -132,26 +146,32 @@
      [\n \a \r \t]
      [\p \u \n \n]])
 
-  (def test-board2
-    [[\p \p \a \w \v]
-     [\o \r \e \r \e]
-     [\g \y \e \s \d]
-     [\a \e \p \y \c]
-     [\n \s \t \r \a]])
-
   (search test-board ti [1 2])
   (search test-board (index-dict dictionary) [1 2])
   (find-all test-board (index-dict dictionary))
   (require '[clojure.string :as string])
 
   (def english
-    (time (index-dict (string/split-lines (slurp "./corncob_lowercase.txt")))))
+    (time (index-dict (string/split-lines (slurp "../corncob_lowercase.txt")))))
   ;about 200 to 300 ms on 2014 macbook pro quad core 8gb ram
   ;list from http://www.mieliestronk.com/wordlist.html ~58k words
 
 
   (time (find-all test-board english))
   ; 7 ms first run, after many runs / warmed(ish) up jit/cache etc ~1ms
-  )
+
+
+  ; see if the java impl and the clj impl are getting the same set of words
+  (def clj (read-words "../clj-words.txt"))
+  (def java (read-words "../java-words.txt"))
+  (require '[clojure.set :as sets])
+
+  (= clj java) ; true!
+  
+  (defn read-words
+    [file]
+    (reduce conj #{} (string/split-lines (slurp file))))
+  
+)
 
 

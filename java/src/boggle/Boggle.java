@@ -21,7 +21,7 @@ public class Boggle {
     {"and", "ant", "are", "bike", "bug", "buggy", "colorado", "utah"};
 
   public static void main(String[] args) throws IOException {
-    Board board = Board.testBoard1();
+    Board board = Board.testBoard2();
     Trie index = indexWords(readWords("../corncob_lowercase.txt"));
     //Trie index = indexWords(Arrays.asList(testWords));
     Collection<String> words = findWords(board, index);
